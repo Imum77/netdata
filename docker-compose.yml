@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "80:3001"
+    volumes:
+      - ./kuma-data:/app/data
+    environment:
+      - HTTP_PROXY=http://10.84.142.62:3128
+      - HTTPS_PROXY=http://10.84.142.62:3128
+      - NO_PROXY=pms.tcell.tj,localhost,127.0.0.1,netdata,10.84.27.1,10.84.27.2,10.84.27.3,10.84.27.4,10.84.27.5,10.84.27.6,10.84.27.7,10.84.27.8,10.84.27.9,10.84.27.10,10.84.27.11,10.84.27.12,10.84.27.13,10.84.27.14
+    networks:
+      - monitoring
+
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata
+    hostname: netdata
+    restart: unless-stopped
+    ports:
+      - "19999:19999"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - netdata-config:/etc/netdata
+      - netdata-lib:/var/lib/netdata
+      - netdata-cache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  netdata-config:
+  netdata-lib:
+  netdata-cache:
