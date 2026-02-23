@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
@@ -34,6 +33,10 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro
+      # health_alarm_notify.conf лежит у тебя внутри health.d
+      - ./health.d/health_alarm_notify.conf:/etc/netdata/health_alarm_notify.conf:ro
+      # кастомные алерты
+      - ./health.d/custom.conf:/etc/netdata/health.d/custom.conf:ro
     networks:
       - monitoring
 
